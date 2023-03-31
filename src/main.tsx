@@ -3,45 +3,53 @@ import ReactDOM from 'react-dom/client'
 import App from './App'
 import './index.css'
 
-import { createStore, Action } from 'redux'
+import { createStore } from 'redux'
 
-const counterReducer = (state = 0, action: Action) => {
-  switch (action.type) {
-    case 'INCREMENT':
-      return state + 1
-    case 'DECREMENT':
-      return state - 1
-    case 'ZERO':
-      return 0
-    default:
-      return state
-  }
+interface Action {
+  type: string
+  payload?: any
 }
 
-const store = createStore(counterReducer)
 
 
+const noteReducer = (state: any[] = [], action: Action) => { 
+  if (action.type === 'NEW_NOTE') {
+    return state.concat(action.payload)
+  }
+
+  return state
+}
+
+const store = createStore(noteReducer)
+
+
+store.dispatch({
+  type: 'NEW_NOTE',
+  payload: {
+    content: 'the app state is in redux store',
+    important: true,
+    id: 1
+  }
+})
+
+store.dispatch({
+  type: 'NEW_NOTE',
+  payload: {
+    content: 'state changes are made with actions',
+    important: false,
+    id: 2
+  }
+})
 const AppVirtual = () => {
+
   return (
     <div>
-      <div>
-        {store.getState()}
-      </div>
-      <button 
-        onClick={e => store.dispatch({ type: 'INCREMENT' })}
-      >
-        plus
-      </button>
-      <button
-        onClick={e => store.dispatch({ type: 'DECREMENT' })}
-      >
-        minus
-      </button>
-      <button 
-        onClick={e => store.dispatch({ type: 'ZERO' })}
-      >
-        zero
-      </button>
+      <ul>
+        {store.getState().map(note =>
+          <li key={note.id}>
+            {note.content} <strong>{note.important ? 'important': ''}</strong>
+          </li>)}
+      </ul>
     </div>
   )
 }
@@ -55,4 +63,6 @@ const renderApp = () => {
 
 renderApp()
 
+//subscribe to the store with renderApp and log the store state
 store.subscribe(renderApp)
+store.subscribe(() => console.log(store.getState()))
