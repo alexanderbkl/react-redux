@@ -1,19 +1,37 @@
-import { useQuery } from 'react-query'
-import { getNotes } from './services/requests'
+import { useQuery, useMutation, useQueryClient } from 'react-query'
+import { getNotes, createNote, updateNote } from './services/requests'
 
 const ReactQuery = () => {
+    const queryClient = useQueryClient()
+
+    const newNoteMutation = useMutation(createNote, {
+        onSuccess: (newNote) => {
+            queryClient.getQueryData('notes')
+            queryClient.setQueryData('notes', notes.concat(newNote))
+        }
+    })
+
     const addNote = async (event) => { event.preventDefault()
         const content = event.target.note.value
         event.target.note.value = ''
         console.log(content)
+        newNoteMutation.mutate({content, important: false})
     }
 
+    const updateNoteMutation = useMutation(updateNote, {
+        onSuccess: (updatedNote) => {
+            queryClient.getQueryData('notes')
+            queryClient.setQueryData('notes', notes.map(note => note.id === updatedNote.id ? updatedNote : note))
+        }
+    })
 
     const toggleImportance = (note) => {
-        console.log('toggle importance of', note.id)
+        updateNoteMutation.mutate({ ...note, important: !note.important })
     }
 
-    const result = useQuery( 'notes', getNotes )
+    const result = useQuery( 'notes', getNotes, {
+        refetchOnWindowFocus: false,
+    } )
 
     console.log(result)
 
@@ -32,7 +50,7 @@ const ReactQuery = () => {
             {notes.map(note =>
                 <li key={note.id} onClick={() => toggleImportance(note)}>
                     {note.content}
-                    <strong>{note.important ? 'important' : ''}</strong>
+                    <strong>{note.important ? ' important' : ''}</strong>
                 </li>
             )}
         </div>

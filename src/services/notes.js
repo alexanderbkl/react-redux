@@ -15,4 +15,5 @@ const createNew = async (content) => {
 
 //Exporting the getAll function as the default export of the module
 
+// eslint-disable-next-line import/no-anonymous-default-export
 export default { getAll, createNew }
