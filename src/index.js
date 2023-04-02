@@ -8,6 +8,7 @@ import App from './App'
 
 //ReactQuery
 import { QueryClient, QueryClientProvider } from 'react-query'
+import { CounterContextProvider } from './CounterContext'
 
 const queryClient = new QueryClient()
 
@@ -22,8 +23,10 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <Provider store={store}>
     <App />
     <QueryClientProvider client={queryClient}>
-    <ReactQuery />
+      <ReactQuery />
     </QueryClientProvider>
-    <UseReducer />
+    <CounterContextProvider>
+      <UseReducer />
+    </CounterContextProvider>
   </Provider>
 )
